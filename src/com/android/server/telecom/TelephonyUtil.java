@@ -79,38 +79,35 @@ public final class TelephonyUtil {
     }
 
     public static boolean shouldProcessAsEmergency(Context context, Uri handle) {
-        return handle != null && isLocalEmergencyNumber(context, handle.getSchemeSpecificPart());
+        return handle != null && isLocalEmergencyNumber(handle.getSchemeSpecificPart());
     }
 
-    public static boolean isLocalEmergencyNumber(Context context, String address) {
+    public static boolean isLocalEmergencyNumber(String address) {
         IExtTelephony mIExtTelephony =
             IExtTelephony.Stub.asInterface(ServiceManager.getService("extphone"));
-        if (mIExtTelephony == null) {
-            return PhoneNumberUtils.isLocalEmergencyNumber(context, address);
-        }
-
+        boolean result = false;
         try {
-            return mIExtTelephony.isLocalEmergencyNumber(address);
-        } catch (RemoteException ex) {
+            result = mIExtTelephony.isLocalEmergencyNumber(address);
+        }catch (RemoteException ex) {
             Log.e(LOG_TAG, ex, "RemoteException");
-            return PhoneNumberUtils.isLocalEmergencyNumber(context, address);
+        } catch (NullPointerException ex) {
+            Log.e(LOG_TAG, ex, "NullPointerException");
         }
+        return result;
     }
 
-    public static boolean isPotentialLocalEmergencyNumber(
-            PhoneNumberUtilsAdapter adapter, Context context, String address) {
+    public static boolean isPotentialLocalEmergencyNumber(String address) {
         IExtTelephony mIExtTelephony =
             IExtTelephony.Stub.asInterface(ServiceManager.getService("extphone"));
-        if (mIExtTelephony == null) {
-            return adapter.isPotentialLocalEmergencyNumber(context, address);
-        }
-
+        boolean result = false;
         try {
-            return mIExtTelephony.isPotentialLocalEmergencyNumber(address);
-        } catch (RemoteException ex) {
+            result = mIExtTelephony.isPotentialLocalEmergencyNumber(address);
+        }catch (RemoteException ex) {
             Log.e(LOG_TAG, ex, "RemoteException");
-            return adapter.isPotentialLocalEmergencyNumber(context, address);
+        } catch (NullPointerException ex) {
+            Log.e(LOG_TAG, ex, "NullPointerException");
         }
+        return result;
     }
 
     public static void sortSimPhoneAccounts(Context context, List<PhoneAccount> accounts) {
